@@ -1,9 +1,12 @@
-package comupstream.py.entity;
+package com.upstream.py.ex.entity;
 
-import comupstream.py.config.PaymentMode;
-import comupstream.py.config.TransactionState;
+import com.upstream.py.ex.config.PaymentType;
+import com.upstream.py.ex.config.TransactionState;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,7 +23,7 @@ public class Transaction {
     private Long id;
     private UUID uuid;
     private BigDecimal total;
-    private PaymentMode paymentType;
+    private PaymentType paymentType;
     private TransactionState state;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Order> orderList;
