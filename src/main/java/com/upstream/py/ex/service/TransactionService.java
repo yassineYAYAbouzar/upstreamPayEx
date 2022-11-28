@@ -3,6 +3,7 @@ package com.upstream.py.ex.service;
 import com.upstream.py.ex.config.TransactionState;
 import com.upstream.py.ex.dto.request.TransactionRequest;
 import com.upstream.py.ex.dto.response.TransactionResponse;
+import com.upstream.py.ex.entity.Order;
 import com.upstream.py.ex.entity.Transaction;
 import com.upstream.py.ex.exception.customExeption.TransactionNotFoundException;
 import com.upstream.py.ex.exception.customExeption.UnauthorizedException;
@@ -36,19 +37,6 @@ public class TransactionService {
     public TransactionResponse saveTransaction(TransactionRequest transactionRequest) {
         Transaction transaction = handelTransaction(transactionRequest);
         return modelMapper.map(transaction, TransactionResponse.class);
-    }
-    public Optional<TransactionResponse> updateTransaction(UUID uuid, TransactionRequest transactionRequest) {
-        Transaction transaction = handelTransaction(transactionRequest);
-        return getTransactionByUui(uuid)
-                .map(tr -> {
-                    if (tr.getState() != TransactionState.NEW){
-                        throw new UnauthorizedException("The status of your transaction is " + tr.getState() + " ,you cannot update it.");
-                    }
-                    tr.setPaymentType(transaction.getPaymentType());
-                    tr.setOrderList(transaction.getOrderList());
-                    tr.setTotal(transaction.getTotal());
-                   return transactionRepository.save(Objects.requireNonNull(tr));
-                }).map(tr -> modelMapper.map(tr, TransactionResponse.class));
     }
 
     public Optional<TransactionResponse> updateTransactionState(UUID uuid) {

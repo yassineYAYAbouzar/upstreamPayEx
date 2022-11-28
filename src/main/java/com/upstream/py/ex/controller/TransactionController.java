@@ -34,7 +34,6 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionService.findTransactionByUuid(uuid));
     }
 
-
     /**
      * Add new transaction
      * @param transactionRequest
@@ -45,17 +44,6 @@ public class TransactionController {
     @PostMapping("/save")
     public ResponseEntity<TransactionResponse> addNewTransaction(@RequestBody  TransactionRequest transactionRequest){
         TransactionResponse transactionResponse = transactionService.saveTransaction(transactionRequest);
-        return ResponseEntity.accepted().body(transactionResponse);
-    }
-    /**
-     * Update transaction
-     * @param uuid
-     * @param transactionRequest
-     * @return
-     */
-    @PutMapping("/edit/command/{uuid}")
-    public ResponseEntity<TransactionResponse> editTransaction(@PathVariable UUID uuid , @RequestBody TransactionRequest transactionRequest ){
-        TransactionResponse transactionResponse = transactionService.updateTransaction(uuid , transactionRequest).get();
         return ResponseEntity.accepted().body(transactionResponse);
     }
     /**
