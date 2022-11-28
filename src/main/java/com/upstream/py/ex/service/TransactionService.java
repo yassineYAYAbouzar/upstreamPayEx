@@ -1,5 +1,5 @@
 package com.upstream.py.ex.service;
-import com.upstream.py.ex.app.TransactionApp;
+
 import com.upstream.py.ex.config.TransactionState;
 import com.upstream.py.ex.dto.request.TransactionRequest;
 import com.upstream.py.ex.dto.response.TransactionResponse;
@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +23,6 @@ import java.util.UUID;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final TransactionApp transactionApp;
     private final ModelMapper modelMapper;
 
     public List<TransactionResponse> fetchAll() {
@@ -34,11 +34,11 @@ public class TransactionService {
     }
 
     public TransactionResponse saveTransaction(TransactionRequest transactionRequest) {
-        Transaction transaction = transactionApp.calTotalTransaction(transactionRequest);
-        return modelMapper.map(transactionRepository.save(transaction) , TransactionResponse.class);
+        Transaction transaction = handelTransaction(transactionRequest);
+        return modelMapper.map(transaction, TransactionResponse.class);
     }
     public Optional<TransactionResponse> updateTransaction(UUID uuid, TransactionRequest transactionRequest) {
-        Transaction transaction = transactionApp.calTotalTransaction(transactionRequest);
+        Transaction transaction = handelTransaction(transactionRequest);
         return getTransactionByUui(uuid)
                 .map(tr -> {
                     if (tr.getState() != TransactionState.NEW){
@@ -53,7 +53,7 @@ public class TransactionService {
 
     public Optional<TransactionResponse> updateTransactionState(UUID uuid) {
         return getTransactionByUui(uuid)
-                .map(TransactionApp::updateTransactionState)
+                .map(TransactionService::updateTransactionState)
                 .map(transaction ->transactionRepository.save(Objects.requireNonNull(transaction)))
                 .map(transaction ->modelMapper.map(transaction , TransactionResponse.class));
     }
@@ -68,5 +68,25 @@ public class TransactionService {
     public void deleteTransaction(UUID uuid) {
         getTransactionByUui(uuid).ifPresent(transactionRepository::delete);
     }
+    public Transaction handelTransaction(TransactionRequest transactionRequest) {
+        Transaction transaction = modelMapper.map(transactionRequest, Transaction.class);
+        transaction.setUuid(UUID.randomUUID());
+        transaction.getOrderList().stream().filter(Objects::nonNull).forEach(order -> order.setUuid(UUID.randomUUID()));
+        transaction.setState(TransactionState.NEW);
+        transaction.setTotal(
+                transaction.getOrderList()
+                        .stream()
+                        .map( order -> order.getPrice().multiply(new BigDecimal(order.getQuantity())))
+                        .reduce(BigDecimal::add).get());
 
+        return transactionRepository.save(transaction);
+    }
+    public static Transaction updateTransactionState(Transaction tr) {
+        switch (tr.getState()) {
+            case NEW -> tr.setState(TransactionState.AUTHORIZED);
+            case AUTHORIZED -> tr.setState(TransactionState.CAPTURED);
+            default ->  throw new UnauthorizedException("The status of your transaction is " + tr.getState() + " ,you cannot update it.");
+        }
+        return tr;
+    }
 }
