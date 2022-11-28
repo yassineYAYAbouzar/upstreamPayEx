@@ -42,7 +42,7 @@ public class TransactionService {
         return getTransactionByUui(uuid)
                 .map(tr -> {
                     if (tr.getState() != TransactionState.NEW){
-                        throw new UnauthorizedException("your transaction status is " + tr.getState() + " you can't updated");
+                        throw new UnauthorizedException("The status of your transaction is " + tr.getState() + " ,you cannot update it.");
                     }
                     tr.setPaymentType(transaction.getPaymentType());
                     tr.setOrderList(transaction.getOrderList());

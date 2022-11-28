@@ -19,7 +19,7 @@ public class TransactionController {
      * return all transactions
      * @return
      */
-    @GetMapping("/")
+    @GetMapping
     public List<TransactionResponse> transactions(){
         return transactionService.fetchAll();
     }

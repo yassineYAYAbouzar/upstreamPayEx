@@ -32,7 +32,7 @@ public class TransactionApp {
         switch (tr.getState()) {
             case NEW -> tr.setState(TransactionState.AUTHORIZED);
             case AUTHORIZED -> tr.setState(TransactionState.CAPTURED);
-            default ->  throw new UnauthorizedException("your transaction status in " + tr.getState() + " state you can't update");
+            default ->  throw new UnauthorizedException("The status of your transaction is " + tr.getState() + " ,you cannot update it.");
         }
         return tr;
     }
