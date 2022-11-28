@@ -3,15 +3,12 @@ package com.upstream.py.ex.entity;
 import com.upstream.py.ex.config.PaymentType;
 import com.upstream.py.ex.config.TransactionState;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
